@@ -6,9 +6,9 @@
           slot="header"
           class="card-header"
         >
-          <span>Data Preparation</span>
+          <span>数据准备</span>
           <div class="toolbar-actions">
-            <span class="subtle">{{ projectContext ? projectContext.projectName : 'Select a project first' }}</span>
+            <span class="subtle">{{ projectContext ? projectContext.projectName : '请先选择项目' }}</span>
             <input
               ref="batchFileInput"
               type="file"
@@ -22,7 +22,7 @@
               :disabled="!projectContext"
               @click="openBatchImportDialog"
             >
-              Batch Import
+              批量导入
             </el-button>
           </div>
         </div>
@@ -43,42 +43,42 @@
           >
             <el-table-column
               prop="towerNo"
-              label="Tower No."
+              label="杆塔号"
               width="90"
             />
             <el-table-column
               prop="stake"
-              label="Stake"
+              label="桩号"
               width="110"
             />
             <el-table-column
-              label="Survey Type"
+              label="测量类型"
               min-width="160"
             >
               <template slot-scope="{ row }">
                 <el-select
                   v-model="row.surveyType"
                   size="mini"
-                  placeholder="Survey type"
+                  placeholder="测量类型"
                   @change="saveSurveyType(row)"
                 >
                   <el-option
-                    label="Tower section"
+                    label="塔基断面"
                     value="Tower section"
                   />
                   <el-option
-                    label="Lidar"
+                    label="激光雷达"
                     value="Lidar"
                   />
                   <el-option
-                    label="Other survey"
+                    label="其他测量"
                     value="Other survey"
                   />
                 </el-select>
               </template>
             </el-table-column>
             <el-table-column
-              label="Points"
+              label="点数"
               width="90"
             >
               <template slot-scope="{ row }">
@@ -94,20 +94,24 @@
                   size="mini"
                   :type="row.hasTifBlob ? 'success' : 'info'"
                 >
-                  {{ row.hasTifBlob ? 'Ready' : 'Missing' }}
+                  {{ row.hasTifBlob ? '就绪' : '缺失' }}
                 </el-tag>
               </template>
             </el-table-column>
             <el-table-column
               prop="sceneStatus"
-              label="Scene Status"
+              label="场景状态"
               width="120"
-            />
+            >
+              <template slot-scope="{ row }">
+                {{ zh(row.sceneStatus) }}
+              </template>
+            </el-table-column>
           </el-table>
         </template>
         <el-empty
           v-else
-          description="Project context is not selected"
+          description="未选择项目"
         />
       </el-card>
     </el-col>
@@ -117,7 +121,7 @@
           slot="header"
           class="card-header"
         >
-          <span>Survey Point Editor</span>
+          <span>测量点编辑</span>
           <div class="toolbar-actions">
             <input
               ref="fileInput"
@@ -138,28 +142,28 @@
               :disabled="!activeNode"
               @click="openImportDialog"
             >
-              Import File
+              导入文件
             </el-button>
             <el-button
               size="mini"
               :disabled="!activeNode"
               @click="downloadSurveyText"
             >
-              Export Text
+              导出文本
             </el-button>
             <el-button
               size="mini"
               :disabled="!activeNode"
               @click="openTifDialog"
             >
-              Upload TIF
+              上传 TIF
             </el-button>
             <el-button
               size="mini"
               :disabled="!activeNode || !activeNode.hasTifBlob"
               @click="removeTif"
             >
-              Clear TIF
+              清除 TIF
             </el-button>
             <el-button
               type="primary"
@@ -168,27 +172,27 @@
               :loading="saving"
               @click="saveSurveyPoints"
             >
-              Save Points
+              保存测量点
             </el-button>
           </div>
         </div>
         <template v-if="activeNode">
           <p class="summary-line">
-            <strong>Node:</strong> {{ activeNode.towerNo }} / {{ activeNode.stake }}
+            <strong>节点：</strong> {{ activeNode.towerNo }} / {{ activeNode.stake }}
           </p>
           <p class="summary-line">
-            <strong>Survey Type:</strong> {{ activeNode.surveyType || 'Not set' }}
+            <strong>测量类型：</strong> {{ zh(activeNode.surveyType) }}
           </p>
           <el-input
             v-model="pointsText"
             type="textarea"
             :rows="16"
-            placeholder="One survey point per line, format: x,y,z"
+            placeholder="每行一个测量点，格式：x,y,z"
           />
         </template>
         <el-empty
           v-else
-          description="Select a node to edit survey points"
+          description="请选择节点后编辑测量点"
         />
       </el-card>
       <el-card
@@ -199,7 +203,7 @@
           slot="header"
           class="card-header"
         >
-          <span>Import History</span>
+          <span>导入历史</span>
         </div>
         <el-table
           v-if="importHistory.length"
@@ -210,33 +214,33 @@
         >
           <el-table-column
             prop="occurredAt"
-            label="Time"
+            label="时间"
             min-width="170"
           />
           <el-table-column
             prop="eventType"
-            label="Event"
+            label="事件"
             width="110"
           />
           <el-table-column
             prop="status"
-            label="Status"
+            label="状态"
             width="80"
           />
           <el-table-column
             prop="target"
-            label="Target"
+            label="目标"
             width="100"
           />
           <el-table-column
             prop="message"
-            label="Message"
+            label="消息"
             min-width="180"
           />
         </el-table>
         <el-empty
           v-else
-          description="No import history yet"
+          description="暂无导入历史"
         />
       </el-card>
     </el-col>
@@ -254,6 +258,7 @@ import {
   uploadNodeTif,
   updateSurveyType
 } from '@/api/foundation/dataPrep'
+import { zh } from '@/utils/foundationI18n'
 
 export default {
   name: 'FoundationDataPrepPage',
@@ -291,6 +296,7 @@ export default {
     }
   },
   methods: {
+    zh,
     async loadResources() {
       if (!this.projectContext) return
       this.loading = true
@@ -330,7 +336,7 @@ export default {
     },
     async saveSurveyType(row) {
       await updateSurveyType(this.projectContext.projectId, row.nodeId, row.surveyType)
-      this.$message.success('Survey type updated')
+      this.$message.success('测量类型已更新')
       await this.loadImportHistory()
       if (this.activeNode && this.activeNode.nodeId === row.nodeId) {
         this.activeNode = { ...row }
@@ -344,7 +350,7 @@ export default {
           surveyType: this.activeNode.surveyType || 'Tower section',
           lines: this.pointsText.split('\n')
         })
-        this.$message.success('Survey points saved')
+        this.$message.success('测量点已保存')
         await this.loadResources()
         await this.loadImportHistory()
       } finally {
@@ -364,7 +370,7 @@ export default {
       if (!file) return
       const text = await file.text()
       this.pointsText = text.replace(/\r\n/g, '\n').trim()
-      this.$message.success(`Loaded ${file.name}`)
+      this.$message.success(`已加载 ${file.name}`)
       event.target.value = ''
     },
     downloadSurveyText() {
@@ -387,7 +393,7 @@ export default {
         fileName: file.name,
         contentBase64
       })
-      this.$message.success(`Uploaded ${file.name}`)
+      this.$message.success(`已上传 ${file.name}`)
       await this.loadResources()
       await this.loadImportHistory()
       await this.loadNodeDocument(this.resources.find(item => item.nodeId === this.activeNode.nodeId) || this.activeNode)
@@ -396,7 +402,7 @@ export default {
     async removeTif() {
       if (!this.activeNode) return
       await clearNodeTif(this.projectContext.projectId, this.activeNode.nodeId)
-      this.$message.success('TIF cleared')
+      this.$message.success('TIF 已清除')
       await this.loadResources()
       await this.loadImportHistory()
       await this.loadNodeDocument(this.resources.find(item => item.nodeId === this.activeNode.nodeId) || this.activeNode)
@@ -429,13 +435,13 @@ export default {
         })
       }
       if (!items.length) {
-        this.$message.warning('No files matched the current project nodes')
+        this.$message.warning('没有文件匹配当前项目节点')
         event.target.value = ''
         return
       }
       const response = await importSurveyBatch(this.projectContext.projectId, { items })
       const result = response.data.data
-      this.batchReport = `Imported ${result.importedCount}, skipped ${result.skippedCount}`
+      this.batchReport = `已导入 ${result.importedCount} 个，跳过 ${result.skippedCount} 个`
       this.$message.success(this.batchReport)
       await this.loadResources()
       await this.loadImportHistory()

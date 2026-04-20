@@ -7,20 +7,20 @@
             slot="header"
             class="card-header"
           >
-            <span>Foundation Calculation</span>
+            <span>基础计算</span>
             <div>
               <el-button
                 size="mini"
                 @click="reloadSchema"
               >
-                Reload schema
+                重载参数
               </el-button>
               <el-button
                 size="mini"
                 :disabled="!projectContext"
                 @click="runBatchCalc"
               >
-                Batch Execute
+                批量执行
               </el-button>
               <el-button
                 type="primary"
@@ -28,62 +28,62 @@
                 :disabled="!readyToRun"
                 @click="runCalc"
               >
-                Execute
+                执行计算
               </el-button>
             </div>
           </div>
           <el-form label-width="120px">
             <el-row :gutter="12">
               <el-col :span="8">
-                <el-form-item label="Foundation Type">
+                <el-form-item label="基础类型">
                   <el-select
                     v-model="foundationType"
                     @change="reloadSchema"
                   >
                     <el-option
-                      label="slab"
+                      label="板式基础"
                       value="slab"
                     />
                     <el-option
-                      label="pile"
+                      label="桩基础"
                       value="pile"
                     />
                     <el-option
-                      label="rock"
+                      label="岩石基础"
                       value="rock"
                     />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="Operation">
+                <el-form-item label="操作">
                   <el-select
                     v-model="operation"
                     @change="reloadSchema"
                   >
                     <el-option
-                      label="calculate"
+                      label="计算"
                       value="calculate"
                     />
                     <el-option
-                      label="verify"
+                      label="校核"
                       value="verify"
                     />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="Iteration">
+                <el-form-item label="执行模式">
                   <el-select
                     v-model="iterationMode"
                     @change="reloadSchema"
                   >
                     <el-option
-                      label="single"
+                      label="单节点"
                       value="single"
                     />
                     <el-option
-                      label="series"
+                      label="批量"
                       value="series"
                     />
                   </el-select>
@@ -95,7 +95,7 @@
               <el-collapse-item
                 v-for="section in sectionNames"
                 :key="section"
-                :title="section"
+                :title="zh(section)"
                 :name="section"
               >
                 <el-row :gutter="12">
@@ -105,7 +105,7 @@
                     :span="field.section === 'Advanced' ? 24 : 12"
                   >
                     <el-form-item
-                      :label="field.caption"
+                      :label="zh(field.caption)"
                       :required="field.required"
                     >
                       <el-select
@@ -115,14 +115,14 @@
                         <el-option
                           v-for="option in field.options"
                           :key="option"
-                          :label="option"
+                          :label="zh(option)"
                           :value="option"
                         />
                       </el-select>
                       <el-input
                         v-else
                         v-model="formValues[field.fieldKey]"
-                        :placeholder="field.caption"
+                        :placeholder="zh(field.caption)"
                       />
                     </el-form-item>
                   </el-col>
@@ -132,15 +132,15 @@
 
             <el-divider />
 
-            <el-form-item label="Batch Node IDs">
+            <el-form-item label="批量节点 ID">
               <el-input
                 v-model="batchNodeText"
                 type="textarea"
                 :rows="4"
-                placeholder="One nodeId per line, or separate by comma/semicolon"
+                placeholder="每行一个 nodeId，也可用逗号或分号分隔"
               />
               <div class="batch-hint">
-                Batch execution reuses the current form values and writes one history record per node.
+                批量执行会复用当前表单参数，并为每个节点写入一条历史记录。
               </div>
             </el-form-item>
           </el-form>
@@ -152,7 +152,7 @@
             slot="header"
             class="card-header"
           >
-            <span>Execution Summary</span>
+            <span>执行摘要</span>
             <span class="subtle">{{ contextLabel }}</span>
           </div>
 
@@ -184,18 +184,18 @@
           </div>
 
           <p class="summary-line">
-            <strong>Missing fields:</strong>
-            {{ preview.missingFields.length ? preview.missingFields.join(', ') : 'None' }}
+            <strong>缺失字段：</strong>
+            {{ preview.missingFields.length ? preview.missingFields.map(zh).join(', ') : '无' }}
           </p>
           <p class="summary-line">
-            <strong>Preview hints:</strong>
+            <strong>预览提示：</strong>
           </p>
           <ul class="hint-list">
             <li
               v-for="hint in preview.geometryHints"
               :key="hint"
             >
-              {{ hint }}
+              {{ zh(hint) }}
             </li>
           </ul>
 
@@ -205,9 +205,9 @@
             v-if="batchResult"
             class="batch-panel"
           >
-            <h4>Batch Result</h4>
+            <h4>批量结果</h4>
             <el-alert
-              :title="`Executed ${batchResult.successCount}/${batchResult.totalCount}, failed ${batchResult.failedCount}`"
+              :title="`已执行 ${batchResult.successCount}/${batchResult.totalCount}，失败 ${batchResult.failedCount}`"
               type="success"
               :closable="false"
               show-icon
@@ -220,17 +220,17 @@
             >
               <el-table-column
                 prop="recordId"
-                label="Record ID"
+                label="记录 ID"
                 min-width="120"
               />
               <el-table-column
                 prop="nodeId"
-                label="Node"
+                label="节点"
                 min-width="180"
               />
               <el-table-column
                 prop="title"
-                label="Title"
+                label="标题"
                 min-width="180"
               />
             </el-table>
@@ -248,7 +248,7 @@
             <el-divider />
           </div>
 
-          <h4>Result History</h4>
+          <h4>结果历史</h4>
           <el-table
             :data="records"
             size="mini"
@@ -258,14 +258,18 @@
           >
             <el-table-column
               prop="title"
-              label="Record"
+              label="记录"
               min-width="180"
             />
             <el-table-column
               prop="operation"
-              label="Mode"
+              label="模式"
               width="100"
-            />
+            >
+              <template slot-scope="{ row }">
+                {{ zh(row.operation) }}
+              </template>
+            </el-table-column>
           </el-table>
 
           <el-descriptions
@@ -275,10 +279,10 @@
             size="small"
             class="record-panel"
           >
-            <el-descriptions-item label="Record ID">
+            <el-descriptions-item label="记录 ID">
               {{ activeRecord.recordId }}
             </el-descriptions-item>
-            <el-descriptions-item label="Created At">
+            <el-descriptions-item label="创建时间">
               {{ activeRecord.createdAt }}
             </el-descriptions-item>
           </el-descriptions>
@@ -290,13 +294,13 @@
               size="mini"
               @click="downloadRecord('json')"
             >
-              Export JSON
+              导出 JSON
             </el-button>
             <el-button
               size="mini"
               @click="downloadRecord('csv')"
             >
-              Export CSV
+              导出 CSV
             </el-button>
           </div>
 
@@ -308,7 +312,7 @@
             <el-tab-pane
               v-for="section in resultSections"
               :key="section.name"
-              :label="section.name"
+              :label="zh(section.name)"
               :name="section.name"
             >
               <el-table
@@ -319,12 +323,16 @@
               >
                 <el-table-column
                   prop="label"
-                  label="Item"
+                  label="项目"
                   min-width="140"
-                />
+                >
+                  <template slot-scope="{ row }">
+                    {{ zh(row.label) }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="value"
-                  label="Value"
+                  label="值"
                   min-width="120"
                 />
               </el-table>
@@ -332,7 +340,7 @@
             <el-tab-pane
               v-for="section in derivedSections"
               :key="`derived-${section.name}`"
-              :label="`${section.name} Detail`"
+              :label="`${zh(section.name)}明细`"
               :name="`derived-${section.name}`"
             >
               <el-table
@@ -343,19 +351,23 @@
               >
                 <el-table-column
                   prop="label"
-                  label="Item"
+                  label="项目"
                   min-width="140"
-                />
+                >
+                  <template slot-scope="{ row }">
+                    {{ zh(row.label) }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="value"
-                  label="Value"
+                  label="值"
                   min-width="120"
                 />
               </el-table>
             </el-tab-pane>
             <el-tab-pane
               v-if="activeRecordDetail"
-              label="Inputs"
+              label="输入参数"
               name="Inputs"
             >
               <el-table
@@ -366,19 +378,23 @@
               >
                 <el-table-column
                   prop="label"
-                  label="Field"
+                  label="字段"
                   min-width="140"
-                />
+                >
+                  <template slot-scope="{ row }">
+                    {{ zh(row.label) }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="value"
-                  label="Value"
+                  label="值"
                   min-width="120"
                 />
               </el-table>
             </el-tab-pane>
             <el-tab-pane
               v-if="activeRecordDetail"
-              label="Result Graphics"
+              label="结果图形"
               name="Result Graphics"
             >
               <div class="preview-figure result-graphics">
@@ -415,24 +431,32 @@
               >
                 <el-table-column
                   prop="title"
-                  label="Layer"
+                  label="图层"
                   min-width="140"
-                />
+                >
+                  <template slot-scope="{ row }">
+                    {{ zh(row.title) }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="type"
-                  label="Type"
+                  label="类型"
                   width="120"
-                />
+                >
+                  <template slot-scope="{ row }">
+                    {{ zh(row.type) }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="pointCount"
-                  label="Points"
+                  label="点数"
                   width="90"
                 />
               </el-table>
             </el-tab-pane>
             <el-tab-pane
               v-if="activeRecordDetail"
-              label="Raw JSON"
+              label="原始 JSON"
               name="Raw JSON"
             >
               <el-input
@@ -461,6 +485,7 @@ import {
   loadCalcTemplate,
   previewCalc
 } from '@/api/foundation/calc'
+import { zh } from '@/utils/foundationI18n'
 
 export default {
   name: 'FoundationCalcPage',
@@ -497,7 +522,7 @@ export default {
     },
     contextLabel() {
       if (!this.projectContext || !this.nodeContext) {
-        return 'Select a project and node first'
+        return '请先选择项目和节点'
       }
       return `${this.projectContext.projectName} / ${this.nodeContext.towerNo || this.nodeContext.nodeId}`
     },
@@ -575,6 +600,7 @@ export default {
     this.reloadSchema()
   },
   methods: {
+    zh,
     normalizeShapePoints(shapes) {
       const width = 420
       const height = 260
@@ -661,7 +687,7 @@ export default {
     },
     async runCalc() {
       const response = await executeCalc(this.buildPayload())
-      this.$message.success('Foundation calculation executed')
+      this.$message.success('基础计算已执行')
       await this.reloadHistory()
       this.activeRecord = response.data.data
       const detailResponse = await getCalcRecordDetail(this.activeRecord.recordId)
@@ -672,12 +698,12 @@ export default {
     async runBatchCalc() {
       const nodeIds = this.batchNodeIds()
       if (!this.projectContext || nodeIds.length === 0) {
-        this.$message.warning('Provide a project and at least one node id for batch execution')
+        this.$message.warning('请提供项目和至少一个节点 ID 后再批量执行')
         return
       }
       const response = await executeCalcBatch(this.buildBatchPayload())
       this.batchResult = response.data.data
-      this.$message.success(`Batch executed ${this.batchResult.successCount}/${this.batchResult.totalCount}`)
+      this.$message.success(`批量执行完成 ${this.batchResult.successCount}/${this.batchResult.totalCount}`)
       await this.reloadHistory()
     },
     async reloadHistory() {

@@ -6,8 +6,8 @@
           slot="header"
           class="card-header"
         >
-          <span>Tower Types</span>
-          <span class="subtle">{{ projectContext ? projectContext.projectName : 'Select a project first' }}</span>
+          <span>塔型列表</span>
+          <span class="subtle">{{ projectContext ? projectContext.projectName : '请先选择项目' }}</span>
         </div>
         <template v-if="projectContext">
           <el-table
@@ -19,21 +19,21 @@
           >
             <el-table-column
               prop="towerType"
-              label="Tower Type"
+              label="塔型"
               min-width="120"
             />
             <el-table-column
               prop="nodeCount"
-              label="Nodes"
+              label="节点"
               width="70"
             />
             <el-table-column
               prop="configuredCount"
-              label="Configured"
+              label="已配置"
               width="90"
             />
             <el-table-column
-              label="Status"
+              label="状态"
               width="90"
             >
               <template slot-scope="{ row }">
@@ -41,7 +41,7 @@
                   size="mini"
                   :type="row.ready ? 'success' : 'warning'"
                 >
-                  {{ row.ready ? 'Ready' : 'Pending' }}
+                  {{ row.ready ? '就绪' : '待完善' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -49,7 +49,7 @@
         </template>
         <el-empty
           v-else
-          description="Project context is not selected"
+          description="未选择项目"
         />
       </el-card>
     </el-col>
@@ -60,21 +60,21 @@
           slot="header"
           class="card-header"
         >
-          <span>Assignments</span>
+          <span>节点塔身分配</span>
           <div class="toolbar-actions">
             <el-tag
               v-if="defaultSuggestion"
               size="mini"
               :type="defaultSuggestion.available ? 'success' : 'info'"
             >
-              {{ defaultSuggestion.available ? defaultSuggestion.towerBodyId : 'No default body' }}
+              {{ defaultSuggestion.available ? defaultSuggestion.towerBodyId : '无默认塔身' }}
             </el-tag>
             <el-button
               size="mini"
               :disabled="!activeTowerType || !defaultSuggestion || !defaultSuggestion.available"
               @click="applyDefaultBody"
             >
-              Apply default
+              应用默认
             </el-button>
             <el-button
               type="primary"
@@ -82,7 +82,7 @@
               :disabled="!activeAssignment"
               @click="saveAssignment"
             >
-              Save
+              保存
             </el-button>
           </div>
         </div>
@@ -95,16 +95,16 @@
           >
             <el-table-column
               prop="towerNo"
-              label="Tower No."
+              label="杆塔号"
               width="90"
             />
             <el-table-column
               prop="stake"
-              label="Stake"
+              label="桩号"
               width="110"
             />
             <el-table-column
-              label="Tower Body"
+              label="塔身"
               min-width="140"
             >
               <template slot-scope="{ row }">
@@ -115,7 +115,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="Pos Adjust"
+              label="位置调整"
               width="120"
             >
               <template slot-scope="{ row }">
@@ -131,7 +131,7 @@
         </template>
         <el-empty
           v-else
-          description="Select a tower type"
+          description="请选择塔型"
         />
       </el-card>
     </el-col>
@@ -142,14 +142,14 @@
           slot="header"
           class="card-header"
         >
-          <span>Legs</span>
+          <span>四腿参数</span>
           <div class="toolbar-actions">
             <el-button
               size="mini"
               :disabled="!activeAssignment"
               @click="autoFillLegs"
             >
-              Auto Fill
+              自动补腿
             </el-button>
             <el-button
               type="primary"
@@ -157,7 +157,7 @@
               :disabled="!activeAssignment"
               @click="saveLegs"
             >
-              Save Legs
+              保存塔腿
             </el-button>
           </div>
         </div>
@@ -169,11 +169,11 @@
           >
             <el-table-column
               prop="leg"
-              label="Leg"
+              label="腿号"
               width="60"
             />
             <el-table-column
-              label="Reduce"
+              label="降基"
               min-width="100"
             >
               <template slot-scope="{ row }">
@@ -184,7 +184,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="Length"
+              label="长度"
               width="90"
             >
               <template slot-scope="{ row }">
@@ -197,7 +197,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="Exposed"
+              label="露高"
               width="90"
             >
               <template slot-scope="{ row }">
@@ -213,7 +213,7 @@
         </template>
         <el-empty
           v-else
-          description="Select an assignment"
+          description="请选择节点分配"
         />
       </el-card>
       <el-card
@@ -224,14 +224,14 @@
           slot="header"
           class="card-header"
         >
-          <span>Leg Rules</span>
+          <span>腿配规则</span>
           <el-button
             type="primary"
             size="mini"
             :disabled="!projectContext"
             @click="saveLegRule"
           >
-            Save Rule
+            保存规则
           </el-button>
         </div>
         <template v-if="projectContext">
@@ -240,42 +240,42 @@
             label-width="120px"
             size="mini"
           >
-            <el-form-item label="Extract Height">
+            <el-form-item label="提取高度">
               <el-input-number
                 v-model="legRule.extractHeight"
                 :precision="2"
                 :step="0.1"
               />
             </el-form-item>
-            <el-form-item label="Height Allow">
+            <el-form-item label="高度容差">
               <el-input-number
                 v-model="legRule.heightAllow"
                 :precision="2"
                 :step="0.1"
               />
             </el-form-item>
-            <el-form-item label="Height Step">
+            <el-form-item label="高度步长">
               <el-input-number
                 v-model="legRule.heightStep"
                 :precision="2"
                 :step="0.1"
               />
             </el-form-item>
-            <el-form-item label="Min LZKT">
+            <el-form-item label="最小 LZKT">
               <el-input-number
                 v-model="legRule.minLzkt"
                 :precision="2"
                 :step="0.1"
               />
             </el-form-item>
-            <el-form-item label="Max LZKT">
+            <el-form-item label="最大 LZKT">
               <el-input-number
                 v-model="legRule.maxLzkt"
                 :precision="2"
                 :step="0.1"
               />
             </el-form-item>
-            <el-form-item label="Dado Mode">
+            <el-form-item label="台阶模式">
               <el-input-number
                 v-model="legRule.dado"
                 :min="0"
@@ -286,7 +286,7 @@
         </template>
         <el-empty
           v-else
-          description="Select a project first"
+          description="请先选择项目"
         />
       </el-card>
     </el-col>
@@ -412,7 +412,7 @@ export default {
       if (!this.activeTowerType) return
       const response = await applyDefaultTowerBody(this.projectContext.projectId, this.activeTowerType.towerType)
       this.assignments = response.data.data || []
-      this.$message.success('Default tower body applied')
+      this.$message.success('默认塔身已应用')
       if (this.assignments.length > 0) {
         await this.loadLegs(this.assignments[0])
       }
@@ -423,26 +423,26 @@ export default {
         towerBodyId: this.activeAssignment.towerBodyId,
         positionAdjust: this.activeAssignment.positionAdjust
       })
-      this.$message.success('Tower assignment saved')
+      this.$message.success('塔身分配已保存')
       await this.loadAssignments(this.activeTowerType)
     },
     async saveLegs() {
       if (!this.activeAssignment) return
       await replaceTowerLegs(this.projectContext.projectId, this.activeAssignment.nodeId, this.legs)
-      this.$message.success('Tower legs saved')
+      this.$message.success('塔腿已保存')
       await this.loadLegs(this.activeAssignment)
     },
     async autoFillLegs() {
       if (!this.activeAssignment) return
       const response = await autoFillTowerLegs(this.projectContext.projectId, this.activeAssignment.nodeId)
       this.legs = response.data.data || []
-      this.$message.success('Tower legs auto-filled from project rule')
+      this.$message.success('已按项目规则自动补腿')
     },
     async saveLegRule() {
       if (!this.projectContext) return
       const response = await updateLegRuleConfig(this.projectContext.projectId, this.legRule)
       this.legRule = response.data.data || this.legRule
-      this.$message.success('Leg rule saved')
+      this.$message.success('腿配规则已保存')
     }
   }
 }

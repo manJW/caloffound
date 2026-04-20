@@ -7,12 +7,12 @@
             slot="header"
             class="card-header"
           >
-            <span>Foundation Overview</span>
+            <span>基础系统总览</span>
             <el-button
               size="mini"
               @click="loadStatus"
             >
-              Refresh
+              刷新
             </el-button>
           </div>
           <el-descriptions
@@ -20,31 +20,31 @@
             :column="2"
             border
           >
-            <el-descriptions-item label="Module">
+            <el-descriptions-item label="模块">
               {{ status.moduleName }}
             </el-descriptions-item>
-            <el-descriptions-item label="Version">
+            <el-descriptions-item label="版本">
               {{ status.version }}
             </el-descriptions-item>
-            <el-descriptions-item label="Frontend">
+            <el-descriptions-item label="前端">
               {{ status.frontendStack }}
             </el-descriptions-item>
-            <el-descriptions-item label="Backend">
+            <el-descriptions-item label="后端">
               {{ status.backendStack }}
             </el-descriptions-item>
-            <el-descriptions-item label="3D">
+            <el-descriptions-item label="三维">
               {{ status.renderStack }}
             </el-descriptions-item>
-            <el-descriptions-item label="Stage">
-              {{ status.stage }}
+            <el-descriptions-item label="阶段">
+              {{ zh(status.stage) }}
             </el-descriptions-item>
-            <el-descriptions-item label="Persistence">
-              {{ status.persistenceMode }}
+            <el-descriptions-item label="持久化">
+              {{ zh(status.persistenceMode) }}
             </el-descriptions-item>
           </el-descriptions>
           <el-empty
             v-else
-            description="Status is not loaded"
+            description="状态尚未加载"
           />
         </el-card>
       </el-col>
@@ -54,14 +54,14 @@
             slot="header"
             class="card-header"
           >
-            <span>Current Scope</span>
+            <span>当前范围</span>
           </div>
           <ul class="scope-list">
-            <li>Project and node management</li>
-            <li>Data preparation and survey point editing</li>
-            <li>Tower assignment and leg editing</li>
-            <li>Foundation calculation with preview/export</li>
-            <li>Three.js node scene viewer</li>
+            <li>项目与节点管理</li>
+            <li>数据准备与测量点编辑</li>
+            <li>塔身分配与四腿编辑</li>
+            <li>基础计算、预览与导出</li>
+            <li>Three.js 节点级三维场景</li>
           </ul>
         </el-card>
       </el-col>
@@ -76,17 +76,17 @@
             slot="header"
             class="card-header"
           >
-            <span>Database Smoke Snapshot</span>
+            <span>数据库烟测快照</span>
             <el-button
               size="mini"
               @click="loadSmoke"
             >
-              Reload Smoke
+              重新烟测
             </el-button>
           </div>
           <el-alert
             v-if="smoke && smoke.persistenceMode !== 'db'"
-            title="Persistence mode is not db. The snapshot may not reflect the legacy MySQL chain."
+            title="当前持久化模式不是数据库模式，快照可能无法反映旧 MySQL 链路。"
             type="warning"
             :closable="false"
             show-icon
@@ -94,7 +94,7 @@
           />
           <el-alert
             v-else-if="smoke && smoke.projectCount === 0"
-            title="Smoke endpoint returned zero projects. Check datasource settings and legacy MySQL availability."
+            title="烟测接口返回 0 个项目，请检查数据源配置和旧 MySQL 可用性。"
             type="warning"
             :closable="false"
             show-icon
@@ -106,25 +106,25 @@
           >
             <el-col :span="6">
               <div class="metric-card">
-                <span class="metric-label">Persistence</span>
-                <strong class="metric-value">{{ smoke.persistenceMode }}</strong>
+                <span class="metric-label">持久化</span>
+                <strong class="metric-value">{{ zh(smoke.persistenceMode) }}</strong>
               </div>
             </el-col>
             <el-col :span="6">
               <div class="metric-card">
-                <span class="metric-label">Projects</span>
+                <span class="metric-label">项目数</span>
                 <strong class="metric-value">{{ smoke.projectCount }}</strong>
               </div>
             </el-col>
             <el-col :span="6">
               <div class="metric-card">
-                <span class="metric-label">Nodes</span>
+                <span class="metric-label">节点数</span>
                 <strong class="metric-value">{{ smoke.nodeCount }}</strong>
               </div>
             </el-col>
             <el-col :span="6">
               <div class="metric-card">
-                <span class="metric-label">Ready Scenes</span>
+                <span class="metric-label">可用三维场景</span>
                 <strong class="metric-value">{{ smoke.readySceneCount }}</strong>
               </div>
             </el-col>
@@ -135,11 +135,11 @@
             border
             class="smoke-summary"
           >
-            <el-descriptions-item label="Blocked Scenes">
+            <el-descriptions-item label="阻塞场景">
               {{ smoke.blockedSceneCount }}
             </el-descriptions-item>
-            <el-descriptions-item label="Regression Guide">
-              See /docs/testing/REGRESSION_PLAN.md
+            <el-descriptions-item label="回归指南">
+              查看 /docs/testing/REGRESSION_PLAN.md
             </el-descriptions-item>
           </el-descriptions>
           <ul
@@ -150,12 +150,12 @@
               v-for="note in smoke.notes"
               :key="note"
             >
-              {{ note }}
+              {{ zh(note) }}
             </li>
           </ul>
           <el-empty
             v-else
-            description="Smoke snapshot is not loaded"
+            description="烟测快照尚未加载"
           />
         </el-card>
       </el-col>
@@ -168,7 +168,7 @@
         slot="header"
         class="card-header"
       >
-        <span>Module Status</span>
+        <span>模块状态</span>
       </div>
       <el-table
         v-if="status"
@@ -178,19 +178,31 @@
       >
         <el-table-column
           prop="module"
-          label="Module"
+          label="模块"
           min-width="120"
-        />
+        >
+          <template slot-scope="{ row }">
+            {{ zh(row.module) }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="status"
-          label="Status"
+          label="状态"
           width="120"
-        />
+        >
+          <template slot-scope="{ row }">
+            {{ zh(row.status) }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="nextMilestone"
-          label="Next Milestone"
+          label="下一步"
           min-width="280"
-        />
+        >
+          <template slot-scope="{ row }">
+            {{ zh(row.nextMilestone) }}
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
   </div>
@@ -198,6 +210,7 @@
 
 <script>
 import { fetchFoundationSmoke, fetchFoundationStatus } from '@/api/foundation/status'
+import { zh } from '@/utils/foundationI18n'
 
 export default {
   name: 'FoundationOverviewPage',
@@ -212,6 +225,7 @@ export default {
     this.loadSmoke()
   },
   methods: {
+    zh,
     async loadStatus() {
       const response = await fetchFoundationStatus()
       this.status = response.data.data

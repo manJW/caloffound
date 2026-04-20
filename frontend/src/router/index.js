@@ -14,37 +14,37 @@ const routes = [
         path: '/foundation/overview',
         component: () => import('@/views/foundation/overview/index'),
         name: 'FoundationOverview',
-        meta: { title: 'Overview', icon: 'data-analysis' }
+        meta: { title: '总览', icon: 'data-analysis' }
       },
       {
         path: '/foundation/project',
         component: () => import('@/views/foundation/project/index'),
         name: 'FoundationProject',
-        meta: { title: 'Projects', icon: 'list' }
+        meta: { title: '项目节点', icon: 'list' }
       },
       {
         path: '/foundation/data-prep',
         component: () => import('@/views/foundation/data-prep/index'),
         name: 'FoundationDataPrep',
-        meta: { title: 'Data Prep', icon: 'upload' }
+        meta: { title: '数据准备', icon: 'upload' }
       },
       {
         path: '/foundation/tower',
         component: () => import('@/views/foundation/tower/index'),
         name: 'FoundationTower',
-        meta: { title: 'Tower Library', icon: 'operation' }
+        meta: { title: '塔型腿配', icon: 'operation' }
       },
       {
         path: '/foundation/calc',
         component: () => import('@/views/foundation/calc/index'),
         name: 'FoundationCalc',
-        meta: { title: 'Calculation', icon: 'edit-outline' }
+        meta: { title: '基础计算', icon: 'edit-outline' }
       },
       {
         path: '/foundation/scene',
         component: () => import('@/views/foundation/scene/index'),
         name: 'FoundationScene',
-        meta: { title: '3D Scene', icon: 'picture-outline' }
+        meta: { title: '三维场景', icon: 'picture-outline' }
       }
     ]
   }

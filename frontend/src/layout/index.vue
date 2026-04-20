@@ -8,22 +8,22 @@
         router
       >
         <el-menu-item index="/foundation/overview">
-          Overview
+          总览
         </el-menu-item>
         <el-menu-item index="/foundation/project">
-          Projects
+          项目节点
         </el-menu-item>
         <el-menu-item index="/foundation/data-prep">
-          Data Prep
+          数据准备
         </el-menu-item>
         <el-menu-item index="/foundation/tower">
-          Tower Library
+          塔型腿配
         </el-menu-item>
         <el-menu-item index="/foundation/calc">
-          Calculation
+          基础计算
         </el-menu-item>
         <el-menu-item index="/foundation/scene">
-          3D Scene
+          三维场景
         </el-menu-item>
       </el-menu>
     </aside>

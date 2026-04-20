@@ -6,8 +6,8 @@
           slot="header"
           class="card-header"
         >
-          <span>3D Scene Nodes</span>
-          <span class="subtle">{{ projectContext ? projectContext.projectName : 'Select a project first' }}</span>
+          <span>三维场景节点</span>
+          <span class="subtle">{{ projectContext ? projectContext.projectName : '请先选择项目' }}</span>
         </div>
         <template v-if="projectContext">
           <el-table
@@ -19,31 +19,35 @@
           >
             <el-table-column
               prop="towerNo"
-              label="Tower No."
+              label="杆塔号"
               width="90"
             />
             <el-table-column
               prop="stake"
-              label="Stake"
+              label="桩号"
               width="100"
             />
             <el-table-column
               prop="terrainSource"
-              label="Terrain"
+              label="地形来源"
               min-width="120"
-            />
+            >
+              <template slot-scope="{ row }">
+                {{ zh(row.terrainSource) }}
+              </template>
+            </el-table-column>
             <el-table-column
               prop="terrainPointCount"
-              label="Points"
+              label="点数"
               width="70"
             />
             <el-table-column
               prop="legCount"
-              label="Legs"
+              label="塔腿"
               width="70"
             />
             <el-table-column
-              label="Launch"
+              label="启动"
               width="90"
             >
               <template slot-scope="{ row }">
@@ -51,7 +55,7 @@
                   size="mini"
                   :type="row.launchable ? 'success' : 'warning'"
                 >
-                  {{ row.launchable ? 'Ready' : 'Blocked' }}
+                  {{ row.launchable ? '就绪' : '阻塞' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -59,7 +63,7 @@
         </template>
         <el-empty
           v-else
-          description="Project context is not selected"
+          description="未选择项目"
         />
       </el-card>
     </el-col>
@@ -69,26 +73,26 @@
           slot="header"
           class="card-header"
         >
-          <span>Three.js Scene</span>
+          <span>Three.js 场景</span>
           <div class="toolbar-actions">
             <el-switch
               v-model="showTerrain"
-              active-text="Terrain"
+              active-text="地形"
             />
             <el-switch
               v-model="showTower"
-              active-text="Tower"
+              active-text="塔身"
             />
             <el-switch
               v-model="showLegs"
-              active-text="Legs"
+              active-text="塔腿"
             />
             <el-button
               size="mini"
               :disabled="!scenePayload"
               @click="resetCamera"
             >
-              Reset Camera
+              重置相机
             </el-button>
           </div>
         </div>
@@ -105,35 +109,35 @@
           size="small"
           class="scene-info"
         >
-          <el-descriptions-item label="Tower / Stake">
+          <el-descriptions-item label="杆塔 / 桩号">
             {{ scenePayload.towerNo }} / {{ scenePayload.stake }}
           </el-descriptions-item>
-          <el-descriptions-item label="Survey Type">
-            {{ scenePayload.surveyType }}
+          <el-descriptions-item label="测量类型">
+            {{ zh(scenePayload.surveyType) }}
           </el-descriptions-item>
-          <el-descriptions-item label="Terrain Source">
-            {{ scenePayload.terrainSource }}
+          <el-descriptions-item label="地形来源">
+            {{ zh(scenePayload.terrainSource) }}
           </el-descriptions-item>
-          <el-descriptions-item label="Scene Status">
-            {{ scenePayload.sceneStatus }}
+          <el-descriptions-item label="场景状态">
+            {{ zh(scenePayload.sceneStatus) }}
           </el-descriptions-item>
-          <el-descriptions-item label="Recommended View">
-            {{ scenePayload.recommendedView }}
+          <el-descriptions-item label="推荐视角">
+            {{ zh(scenePayload.recommendedView) }}
           </el-descriptions-item>
-          <el-descriptions-item label="Layer Count">
+          <el-descriptions-item label="图层数">
             {{ sceneLayers.length }}
           </el-descriptions-item>
-          <el-descriptions-item label="Terrain Points">
+          <el-descriptions-item label="地形点数">
             {{ scenePayload.terrainPointCount }}
           </el-descriptions-item>
-          <el-descriptions-item label="Leg Count">
+          <el-descriptions-item label="塔腿数">
             {{ scenePayload.legCount }}
           </el-descriptions-item>
         </el-descriptions>
 
         <el-alert
           v-if="scenePayload"
-          :title="scenePayload.launchable ? 'Scene is ready for browser rendering.' : 'Scene is blocked. Resolve blockers below.'"
+          :title="scenePayload.launchable ? '场景已就绪，可在浏览器中渲染。' : '场景被阻塞，请先处理下方问题。'"
           :type="scenePayload.launchable ? 'success' : 'warning'"
           :closable="false"
           show-icon
@@ -158,22 +162,29 @@
           class="scene-layers"
         >
           <el-table-column
-            prop="title"
-            label="Layer"
+            label="图层"
             min-width="160"
-          />
+          >
+            <template slot-scope="{ row }">
+              {{ zh(row.title) }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="type"
-            label="Type"
+            label="类型"
             width="110"
-          />
+          >
+            <template slot-scope="{ row }">
+              {{ zh(row.type) }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="pointCount"
-            label="Points"
+            label="点数"
             width="90"
           />
           <el-table-column
-            label="Color"
+            label="颜色"
             width="90"
           >
             <template slot-scope="{ row }">
@@ -192,6 +203,7 @@
 <script>
 import * as THREE from 'three'
 import { listSceneNodes, loadNodeScene } from '@/api/foundation/scene'
+import { zh } from '@/utils/foundationI18n'
 
 export default {
   name: 'FoundationScenePage',
@@ -261,6 +273,7 @@ export default {
     this.disposeRenderer()
   },
   methods: {
+    zh,
     async loadSceneNodes() {
       this.loading = true
       try {
