@@ -1,0 +1,11 @@
+{
+  "persistenceMode": "db",
+  "projectCount": 2,
+  "nodeCount": 4,
+  "readySceneCount": 3,
+  "blockedSceneCount": 0,
+  "notes": [
+    "Example smoke snapshot shape for /foundation/status/smoke.",
+    "Counts depend on the connected legacy MySQL database."
+  ]
+}

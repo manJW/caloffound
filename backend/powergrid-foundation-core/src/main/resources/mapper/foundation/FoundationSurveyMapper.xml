@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationSurveyMapper">
+
+    <resultMap id="FoundationSurveyPointMap" type="com.powergrid.foundation.core.persistence.model.FoundationSurveyPointRow">
+        <id property="positionId" column="position_id"/>
+        <result property="surveyId" column="survey_id"/>
+        <result property="posX" column="pos_x"/>
+        <result property="posY" column="pos_y"/>
+        <result property="posZ" column="pos_z"/>
+    </resultMap>
+
+    <select id="selectSurveyIdByNodeId" parameterType="string" resultType="string">
+        SELECT ZPDISURVERID
+        FROM dced_prj_survey
+        WHERE ZPDILINENIODEID = #{nodeId}
+        LIMIT 1
+    </select>
+
+    <select id="selectSurveyTypeByNodeId" parameterType="string" resultType="string">
+        SELECT ZPDISURVERTYPE
+        FROM dced_prj_survey
+        WHERE ZPDILINENIODEID = #{nodeId}
+        LIMIT 1
+    </select>
+
+    <select id="selectSurveyPoints" parameterType="string" resultMap="FoundationSurveyPointMap">
+        SELECT
+            ZPDIPOSITIONID AS position_id,
+            ZPDISURVERID AS survey_id,
+            ZPDIPOSX AS pos_x,
+            ZPDIPOSY AS pos_y,
+            ZPDIPOSZ AS pos_z
+        FROM dced_prj_surveyposition
+        WHERE ZPDISURVERID = #{surveyId}
+        ORDER BY ZPDIPOSITIONID
+    </select>
+
+    <insert id="insertSurveyHeader">
+        INSERT INTO dced_prj_survey (
+            ZPDISURVERID,
+            ZPDILINENIODEID,
+            ZPDISURVERTYPE,
+            ZPDIMARK
+        ) VALUES (
+            #{surveyId},
+            #{nodeId},
+            #{surveyType},
+            #{mark}
+        )
+    </insert>
+
+    <update id="updateSurveyHeader">
+        UPDATE dced_prj_survey
+        SET
+            ZPDISURVERTYPE = #{surveyType},
+            ZPDIMARK = #{mark}
+        WHERE ZPDISURVERID = #{surveyId}
+    </update>
+
+    <delete id="deleteSurveyPoints">
+        DELETE FROM dced_prj_surveyposition
+        WHERE ZPDISURVERID = #{surveyId}
+    </delete>
+
+    <delete id="deleteSurveyHeader">
+        DELETE FROM dced_prj_survey
+        WHERE ZPDISURVERID = #{surveyId}
+    </delete>
+
+    <update id="updateSurveyTif">
+        UPDATE dced_prj_survey
+        SET
+            ZPDITIFFile = #{tifFile},
+            ZPDIresolution = #{resolution}
+        WHERE ZPDISURVERID = #{surveyId}
+    </update>
+
+    <update id="clearSurveyTif">
+        UPDATE dced_prj_survey
+        SET
+            ZPDITIFFile = NULL
+        WHERE ZPDISURVERID = #{surveyId}
+    </update>
+
+    <insert id="insertSurveyPoint">
+        INSERT INTO dced_prj_surveyposition (
+            ZPDIPOSITIONID,
+            ZPDISURVERID,
+            ZPDIPOSX,
+            ZPDIPOSY,
+            ZPDIPOSZ
+        ) VALUES (
+            #{positionId},
+            #{surveyId},
+            #{posX},
+            #{posY},
+            #{posZ}
+        )
+    </insert>
+
+</mapper>

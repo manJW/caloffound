@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationLegRuleMapper">
+
+    <resultMap id="FoundationLegRuleMap" type="com.powergrid.foundation.core.persistence.model.FoundationLegRuleRow">
+        <id property="ruleId" column="rule_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="extractHeight" column="extract_height"/>
+        <result property="heightAllow" column="height_allow"/>
+        <result property="heightStep" column="height_step"/>
+        <result property="minLzkt" column="min_lzkt"/>
+        <result property="maxLzkt" column="max_lzkt"/>
+        <result property="dado" column="dado"/>
+    </resultMap>
+
+    <select id="selectLegRule" resultMap="FoundationLegRuleMap">
+        SELECT
+            ZPDILEGSETID AS rule_id,
+            ZPDIPRJID AS project_id,
+            ZPDIEXTRACTHEIGHT AS extract_height,
+            ZPDIHEIGHTALLOW AS height_allow,
+            ZPDIHEIGHTSTEP AS height_step,
+            ZPDIMINLZKT AS min_lzkt,
+            ZPDIMAXLZKT AS max_lzkt,
+            ZPDIDADO AS dado
+        FROM dced_prj_legsetconfig
+        WHERE ZPDIPRJID = #{projectId}
+        LIMIT 1
+    </select>
+
+    <insert id="replaceLegRule">
+        REPLACE INTO dced_prj_legsetconfig (
+            ZPDILEGSETID,
+            ZPDIEXTRACTHEIGHT,
+            ZPDIHEIGHTALLOW,
+            ZPDIHEIGHTSTEP,
+            ZPDIMINLZKT,
+            ZPDIMAXLZKT,
+            ZPDIDADO,
+            ZPDIPRJID
+        ) VALUES (
+            #{ruleId},
+            #{extractHeight},
+            #{heightAllow},
+            #{heightStep},
+            #{minLzkt},
+            #{maxLzkt},
+            #{dado},
+            #{projectId}
+        )
+    </insert>
+
+</mapper>

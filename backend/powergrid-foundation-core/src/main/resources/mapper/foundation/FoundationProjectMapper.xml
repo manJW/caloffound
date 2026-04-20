@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationProjectMapper">
+
+    <resultMap id="FoundationProjectSummaryMap" type="com.powergrid.foundation.core.persistence.model.FoundationProjectSummaryRow">
+        <id property="projectId" column="project_id"/>
+        <result property="projectCode" column="project_code"/>
+        <result property="projectName" column="project_name"/>
+        <result property="startAddress" column="start_address"/>
+        <result property="endAddress" column="end_address"/>
+        <result property="nodeCount" column="node_count"/>
+    </resultMap>
+
+    <resultMap id="FoundationProjectNodeMap" type="com.powergrid.foundation.core.persistence.model.FoundationProjectNodeRow">
+        <id property="nodeId" column="node_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="towerNo" column="tower_no"/>
+        <result property="stake" column="stake"/>
+        <result property="nodeOrder" column="node_order"/>
+        <result property="surveyType" column="survey_type"/>
+        <result property="towerType" column="tower_type"/>
+        <result property="towerBodyId" column="tower_body_id"/>
+        <result property="posHeight" column="pos_height"/>
+        <result property="posHeightAdjust" column="pos_height_adjust"/>
+        <result property="lon" column="lon"/>
+        <result property="lat" column="lat"/>
+        <result property="hasTifBlob" column="has_tif_blob"/>
+    </resultMap>
+
+    <select id="selectProjectSummaries" resultMap="FoundationProjectSummaryMap">
+        SELECT
+            p.ZPDIPRJID AS project_id,
+            p.ZPDIPRJNCODE AS project_code,
+            p.ZPDIPRJNAME AS project_name,
+            p.ZPDISTARTADRESS AS start_address,
+            p.ZPDIENDADRESS AS end_address,
+            COUNT(n.ZPDIPRJLINENODEID) AS node_count
+        FROM dced_prj_prjinfo p
+        LEFT JOIN dced_sys_version v ON v.ZPDIVERSIONID = (
+            SELECT v2.ZPDIVERSIONID
+            FROM dced_sys_version v2
+            WHERE v2.ZPDIPARENTPROJECT = p.ZPDIPRJID
+            ORDER BY v2.ZPDIVERLASTCHAGEDATE DESC, v2.ZPDICREATETIME DESC, v2.ZPDIVERSIONID DESC
+            LIMIT 1
+        )
+        LEFT JOIN dced_prj_linenode n ON n.ZPDIPRJID = COALESCE(v.ZPDIVERSIONID, p.ZPDIPRJID)
+        GROUP BY
+            p.ZPDIPRJID,
+            p.ZPDIPRJNCODE,
+            p.ZPDIPRJNAME,
+            p.ZPDISTARTADRESS,
+            p.ZPDIENDADRESS
+        ORDER BY p.ZPDIPRJNAME
+    </select>
+
+    <select id="selectProjectSummary" parameterType="string" resultMap="FoundationProjectSummaryMap">
+        SELECT
+            p.ZPDIPRJID AS project_id,
+            p.ZPDIPRJNCODE AS project_code,
+            p.ZPDIPRJNAME AS project_name,
+            p.ZPDISTARTADRESS AS start_address,
+            p.ZPDIENDADRESS AS end_address,
+            COUNT(n.ZPDIPRJLINENODEID) AS node_count
+        FROM dced_prj_prjinfo p
+        LEFT JOIN dced_sys_version v ON v.ZPDIVERSIONID = (
+            SELECT v2.ZPDIVERSIONID
+            FROM dced_sys_version v2
+            WHERE v2.ZPDIPARENTPROJECT = p.ZPDIPRJID
+            ORDER BY v2.ZPDIVERLASTCHAGEDATE DESC, v2.ZPDICREATETIME DESC, v2.ZPDIVERSIONID DESC
+            LIMIT 1
+        )
+        LEFT JOIN dced_prj_linenode n ON n.ZPDIPRJID = COALESCE(v.ZPDIVERSIONID, p.ZPDIPRJID)
+        WHERE p.ZPDIPRJID = #{projectId}
+        GROUP BY
+            p.ZPDIPRJID,
+            p.ZPDIPRJNCODE,
+            p.ZPDIPRJNAME,
+            p.ZPDISTARTADRESS,
+            p.ZPDIENDADRESS
+    </select>
+
+    <select id="selectProjectNodes" parameterType="string" resultMap="FoundationProjectNodeMap">
+        SELECT
+            #{projectId} AS project_id,
+            n.ZPDIPRJLINENODEID AS node_id,
+            n.ZPDITOWERNO AS tower_no,
+            n.ZPDISTAKE AS stake,
+            n.ZPDIORDER AS node_order,
+            s.ZPDISURVERTYPE AS survey_type,
+            e.ZPDITOWERTYPE AS tower_type,
+            e.ZPDITOWERBODYID AS tower_body_id,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDIPOSHEIGHT), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDIPOSHEIGHT) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS pos_height,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDIPOSHEIGHTADJUST), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDIPOSHEIGHTADJUST) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS pos_height_adjust,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILON), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILON) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lon,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILAT), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILAT) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lat,
+            CASE WHEN s.ZPDITIFFile IS NULL THEN FALSE ELSE TRUE END AS has_tif_blob
+        FROM dced_prj_linenode n
+        LEFT JOIN dced_prj_survey s ON s.ZPDILINENIODEID = n.ZPDIPRJLINENODEID
+        LEFT JOIN dced_prj_electric e ON e.ZPDIPRJLINENODEID = n.ZPDIPRJLINENODEID
+        WHERE n.ZPDIPRJID = COALESCE((
+            SELECT v.ZPDIVERSIONID
+            FROM dced_sys_version v
+            WHERE v.ZPDIPARENTPROJECT = #{projectId}
+            ORDER BY v.ZPDIVERLASTCHAGEDATE DESC, v.ZPDICREATETIME DESC, v.ZPDIVERSIONID DESC
+            LIMIT 1
+        ), #{projectId})
+        ORDER BY n.ZPDIORDER
+    </select>
+
+    <select id="selectMaxNodeOrder" parameterType="string" resultType="int">
+        SELECT COALESCE(MAX(ZPDIORDER), 0)
+        FROM dced_prj_linenode
+        WHERE ZPDIPRJID = COALESCE((
+            SELECT v.ZPDIVERSIONID
+            FROM dced_sys_version v
+            WHERE v.ZPDIPARENTPROJECT = #{projectId}
+            ORDER BY v.ZPDIVERLASTCHAGEDATE DESC, v.ZPDICREATETIME DESC, v.ZPDIVERSIONID DESC
+            LIMIT 1
+        ), #{projectId})
+    </select>
+
+    <insert id="insertProject">
+        INSERT INTO dced_prj_prjinfo (
+            ZPDIPRJID,
+            ZPDIPRJNCODE,
+            ZPDIPRJNAME,
+            ZPDISTARTADRESS,
+            ZPDIENDADRESS
+        ) VALUES (
+            #{projectId},
+            #{projectCode},
+            #{projectName},
+            #{startAddress},
+            #{endAddress}
+        )
+    </insert>
+
+    <update id="updateProject">
+        UPDATE dced_prj_prjinfo
+        SET
+            ZPDIPRJNCODE = #{projectCode},
+            ZPDIPRJNAME = #{projectName},
+            ZPDISTARTADRESS = #{startAddress},
+            ZPDIENDADRESS = #{endAddress}
+        WHERE ZPDIPRJID = #{projectId}
+    </update>
+
+    <insert id="insertProjectNode">
+        INSERT INTO dced_prj_linenode (
+            ZPDIPRJLINENODEID,
+            ZPDIPRJID,
+            ZPDITOWERNO,
+            ZPDISTAKE,
+            ZPDIORDER
+        ) VALUES (
+            #{nodeId},
+            COALESCE((
+                SELECT latest_version_id
+                FROM (
+                    SELECT v.ZPDIVERSIONID AS latest_version_id
+                    FROM dced_sys_version v
+                    WHERE v.ZPDIPARENTPROJECT = #{projectId}
+                    ORDER BY v.ZPDIVERLASTCHAGEDATE DESC, v.ZPDICREATETIME DESC, v.ZPDIVERSIONID DESC
+                    LIMIT 1
+                ) latest_version
+            ), #{projectId}),
+            #{towerNo},
+            #{stake},
+            #{nodeOrder}
+        )
+    </insert>
+
+    <update id="updateProjectNode">
+        UPDATE dced_prj_linenode
+        SET
+            ZPDITOWERNO = #{towerNo},
+            ZPDISTAKE = #{stake},
+            ZPDIORDER = #{nodeOrder}
+        WHERE ZPDIPRJLINENODEID = #{nodeId}
+    </update>
+
+    <delete id="deleteProject">
+        DELETE FROM dced_prj_prjinfo
+        WHERE ZPDIPRJID = #{projectId}
+    </delete>
+
+    <delete id="deleteProjectNode">
+        DELETE FROM dced_prj_linenode
+        WHERE ZPDIPRJLINENODEID = #{nodeId}
+    </delete>
+
+</mapper>

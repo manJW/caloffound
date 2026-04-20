@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationCalcRecordMapper">
+
+    <resultMap id="FoundationCalcRecordMap" type="com.powergrid.foundation.core.persistence.model.FoundationCalcRecordRow">
+        <id property="recordId" column="record_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="nodeId" column="node_id"/>
+        <result property="foundationType" column="foundation_type"/>
+        <result property="operation" column="operation"/>
+        <result property="iterationMode" column="iteration_mode"/>
+        <result property="title" column="title"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="inputValuesJson" column="input_values_json"/>
+        <result property="resultItemsJson" column="result_items_json"/>
+        <result property="derivedItemsJson" column="derived_items_json"/>
+        <result property="graphicsJson" column="graphics_json"/>
+        <result property="exportJson" column="export_json"/>
+    </resultMap>
+
+    <update id="ensureCalcRecordTable">
+        CREATE TABLE IF NOT EXISTS foundation_calc_record (
+            record_id VARCHAR(64) NOT NULL PRIMARY KEY,
+            project_id VARCHAR(64) NOT NULL,
+            node_id VARCHAR(64) NOT NULL,
+            foundation_type VARCHAR(64) NOT NULL,
+            operation VARCHAR(64) NOT NULL,
+            iteration_mode VARCHAR(64) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            created_at DATETIME NOT NULL,
+            input_values_json JSON NULL,
+            result_items_json JSON NOT NULL,
+            derived_items_json JSON NOT NULL,
+            graphics_json JSON NOT NULL,
+            export_json JSON NOT NULL,
+            INDEX idx_foundation_calc_project_node (project_id, node_id, created_at),
+            INDEX idx_foundation_calc_node (node_id, created_at)
+        )
+    </update>
+
+    <insert id="insertCalcRecord">
+        INSERT INTO foundation_calc_record (
+            record_id,
+            project_id,
+            node_id,
+            foundation_type,
+            operation,
+            iteration_mode,
+            title,
+            created_at,
+            input_values_json,
+            result_items_json,
+            derived_items_json,
+            graphics_json,
+            export_json
+        ) VALUES (
+            #{recordId},
+            #{projectId},
+            #{nodeId},
+            #{foundationType},
+            #{operation},
+            #{iterationMode},
+            #{title},
+            #{createdAt},
+            #{inputValuesJson},
+            #{resultItemsJson},
+            #{derivedItemsJson},
+            #{graphicsJson},
+            #{exportJson}
+        )
+    </insert>
+
+    <select id="selectCalcRecords" resultMap="FoundationCalcRecordMap">
+        SELECT
+            record_id,
+            project_id,
+            node_id,
+            foundation_type,
+            operation,
+            iteration_mode,
+            title,
+            created_at,
+            input_values_json,
+            result_items_json,
+            derived_items_json,
+            graphics_json,
+            export_json
+        FROM foundation_calc_record
+        WHERE project_id = #{projectId}
+          AND node_id = #{nodeId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectCalcRecord" resultMap="FoundationCalcRecordMap">
+        SELECT
+            record_id,
+            project_id,
+            node_id,
+            foundation_type,
+            operation,
+            iteration_mode,
+            title,
+            created_at,
+            input_values_json,
+            result_items_json,
+            derived_items_json,
+            graphics_json,
+            export_json
+        FROM foundation_calc_record
+        WHERE record_id = #{recordId}
+        LIMIT 1
+    </select>
+</mapper>

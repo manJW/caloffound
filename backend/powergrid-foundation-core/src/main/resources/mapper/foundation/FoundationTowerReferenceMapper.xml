@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationTowerReferenceMapper">
+
+    <select id="selectProjectTowerTypeId" resultType="string">
+        SELECT ZPDITOWERTYPEID
+        FROM dced_project_towertype
+        WHERE ZPDIPROJECTID = #{projectId}
+          AND ZPDITOWERTYPENAME = #{towerTypeName}
+        LIMIT 1
+    </select>
+
+    <select id="selectDefaultTowerBodyId" resultType="string">
+        SELECT ZPDITOWERBODYID
+        FROM dced_project_towerbody
+        WHERE ZPDITOWERETYPEID = #{towerTypeId}
+        ORDER BY ZPDICALLHEIGHT
+        LIMIT 1
+    </select>
+
+</mapper>

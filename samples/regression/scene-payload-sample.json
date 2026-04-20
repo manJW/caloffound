@@ -1,0 +1,17 @@
+{
+  "projectId": "PRJ-DEMO-001",
+  "nodeId": "NODE-001",
+  "towerNo": "T001",
+  "stake": "K0+120",
+  "terrainSource": "survey-points",
+  "launchable": true,
+  "recommendedView": "isometric",
+  "cameraPosition": { "x": 18.0, "y": 18.0, "z": 18.0, "label": "Camera" },
+  "cameraTarget": { "x": 0.0, "y": 0.0, "z": 0.0, "label": "Target" },
+  "layers": [
+    { "layerKey": "terrain", "title": "Terrain points", "type": "points" },
+    { "layerKey": "tower", "title": "Tower body", "type": "marker" },
+    { "layerKey": "legs", "title": "Tower legs", "type": "points" },
+    { "layerKey": "helpers", "title": "Tower footprint", "type": "polyline" }
+  ]
+}

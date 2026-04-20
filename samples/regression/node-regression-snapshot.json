@@ -1,0 +1,36 @@
+{
+  "persistenceMode": "db",
+  "projectId": "PRJ-DEMO-001",
+  "nodeId": "NODE-001",
+  "node": {
+    "projectId": "PRJ-DEMO-001",
+    "nodeId": "NODE-001",
+    "towerNo": "T001",
+    "stake": "K0+120",
+    "surveyType": "塔基断面",
+    "towerType": "ZM1",
+    "sceneStatus": "ready"
+  },
+  "terrainResource": {
+    "projectId": "PRJ-DEMO-001",
+    "nodeId": "NODE-001",
+    "towerNo": "T001",
+    "stake": "K0+120",
+    "surveyType": "塔基断面",
+    "hasTifBlob": false,
+    "sceneStatus": "ready"
+  },
+  "towerAssignment": {
+    "nodeId": "NODE-001",
+    "towerNo": "T001",
+    "stake": "K0+120",
+    "towerBodyId": "BODY-ZM1-A",
+    "legCount": 4,
+    "sceneStatus": "ready"
+  },
+  "sceneSummary": {
+    "nodeId": "NODE-001",
+    "terrainSource": "survey-points",
+    "launchable": true
+  }
+}

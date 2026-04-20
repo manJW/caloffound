@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.powergrid.foundation.core.persistence.mapper.FoundationTowerMapper">
+
+    <resultMap id="FoundationTowerAssignmentMap" type="com.powergrid.foundation.core.persistence.model.FoundationTowerAssignmentRow">
+        <id property="nodeId" column="node_id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="towerNo" column="tower_no"/>
+        <result property="stake" column="stake"/>
+        <result property="towerType" column="tower_type"/>
+        <result property="towerBodyId" column="tower_body_id"/>
+        <result property="posHeightAdjust" column="pos_height_adjust"/>
+        <result property="lon" column="lon"/>
+        <result property="lat" column="lat"/>
+    </resultMap>
+
+    <resultMap id="FoundationTowerLegMap" type="com.powergrid.foundation.core.persistence.model.FoundationTowerLegRow">
+        <id property="nodeId" column="node_id"/>
+        <id property="legName" column="leg_name"/>
+        <result property="legReduce" column="leg_reduce"/>
+        <result property="legLength" column="leg_length"/>
+        <result property="exposedHeight" column="exposed_height"/>
+        <result property="topElevation" column="top_elevation"/>
+        <result property="slope" column="slope"/>
+        <result property="mark" column="mark"/>
+    </resultMap>
+
+    <select id="selectTowerAssignments" parameterType="string" resultMap="FoundationTowerAssignmentMap">
+        SELECT
+            #{projectId} AS project_id,
+            n.ZPDIPRJLINENODEID AS node_id,
+            n.ZPDITOWERNO AS tower_no,
+            n.ZPDISTAKE AS stake,
+            e.ZPDITOWERTYPE AS tower_type,
+            e.ZPDITOWERBODYID AS tower_body_id,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDIPOSHEIGHTADJUST), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDIPOSHEIGHTADJUST) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS pos_height_adjust,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILON), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILON) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lon,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILAT), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILAT) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lat
+        FROM dced_prj_linenode n
+        LEFT JOIN dced_prj_electric e ON e.ZPDIPRJLINENODEID = n.ZPDIPRJLINENODEID
+        WHERE n.ZPDIPRJID = COALESCE((
+            SELECT v.ZPDIVERSIONID
+            FROM dced_sys_version v
+            WHERE v.ZPDIPARENTPROJECT = #{projectId}
+            ORDER BY v.ZPDIVERLASTCHAGEDATE DESC, v.ZPDICREATETIME DESC, v.ZPDIVERSIONID DESC
+            LIMIT 1
+        ), #{projectId})
+        ORDER BY n.ZPDIORDER
+    </select>
+
+    <select id="selectTowerAssignment" parameterType="string" resultMap="FoundationTowerAssignmentMap">
+        SELECT
+            n.ZPDIPRJID AS project_id,
+            n.ZPDIPRJLINENODEID AS node_id,
+            n.ZPDITOWERNO AS tower_no,
+            n.ZPDISTAKE AS stake,
+            e.ZPDITOWERTYPE AS tower_type,
+            e.ZPDITOWERBODYID AS tower_body_id,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDIPOSHEIGHTADJUST), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDIPOSHEIGHTADJUST) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS pos_height_adjust,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILON), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILON) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lon,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(e.ZPDILAT), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(e.ZPDILAT) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS lat
+        FROM dced_prj_linenode n
+        LEFT JOIN dced_prj_electric e ON e.ZPDIPRJLINENODEID = n.ZPDIPRJLINENODEID
+        WHERE n.ZPDIPRJLINENODEID = #{nodeId}
+        LIMIT 1
+    </select>
+
+    <select id="selectTowerLegs" parameterType="string" resultMap="FoundationTowerLegMap">
+        SELECT
+            ZPDILEGLINENODEID AS node_id,
+            ZPDILEGNAME AS leg_name,
+            ZPDILEGREDUCE AS leg_reduce,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(ZPDILEGLENGTH), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(ZPDILEGLENGTH) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS leg_length,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(ZPDIEXTRCATNUMBER), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(ZPDIEXTRCATNUMBER) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS exposed_height,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(ZPDITOPELEVA), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(ZPDITOPELEVA) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS top_elevation,
+            CASE
+                WHEN REGEXP_LIKE(TRIM(ZPDISLOPE), '^-?[0-9]+(\\.[0-9]+)?$')
+                THEN CAST(TRIM(ZPDISLOPE) AS DECIMAL(18, 6))
+                ELSE NULL
+            END AS slope,
+            ZPDIMARK AS mark
+        FROM dced_prj_leginfo
+        WHERE ZPDILEGLINENODEID = #{nodeId}
+        ORDER BY ZPDILEGNAME
+    </select>
+
+    <update id="updateTowerAssignment">
+        UPDATE dced_prj_electric
+        SET
+            ZPDITOWERBODYID = #{towerBodyId},
+            ZPDIPOSHEIGHTADJUST = #{posHeightAdjust}
+        WHERE ZPDIPRJLINENODEID = #{nodeId}
+    </update>
+
+    <insert id="insertTowerAssignment">
+        INSERT INTO dced_prj_electric (
+            ZPDIELCTRICID,
+            ZPDIPRJLINENODEID,
+            ZPDITOWERTYPE,
+            ZPDIPOSHEIGHT,
+            ZPDIANGLE,
+            ZPDILON,
+            ZPDILAT,
+            ZPDIMARK,
+            ZPDITOWERBODYID,
+            ZPDIPOSHEIGHTADJUST
+        ) VALUES (
+            #{electricId},
+            #{nodeId},
+            #{towerType},
+            #{posHeight},
+            #{angle},
+            #{lon},
+            #{lat},
+            #{mark},
+            #{towerBodyId},
+            #{posHeightAdjust}
+        )
+    </insert>
+
+    <delete id="deleteTowerAssignment">
+        DELETE FROM dced_prj_electric
+        WHERE ZPDIPRJLINENODEID = #{nodeId}
+    </delete>
+
+    <delete id="deleteTowerLegs">
+        DELETE FROM dced_prj_leginfo
+        WHERE ZPDILEGLINENODEID = #{nodeId}
+    </delete>
+
+    <insert id="insertTowerLeg">
+        INSERT INTO dced_prj_leginfo (
+            ZPDILEGID,
+            ZPDILEGNAME,
+            ZPDILEGLINENODEID,
+            ZPDILEGREDUCE,
+            ZPDILEGLENGTH,
+            ZPDIEXTRCATNUMBER,
+            ZPDIMARK,
+            ZPDITOPELEVA,
+            ZPDISLOPE
+        ) VALUES (
+            #{legId},
+            #{legName},
+            #{nodeId},
+            #{legReduce},
+            #{legLength},
+            #{exposedHeight},
+            #{mark},
+            #{topElevation},
+            #{slope}
+        )
+    </insert>
+
+</mapper>

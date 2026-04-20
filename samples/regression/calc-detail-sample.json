@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "recordId": "CALC-DEMO0001",
+    "projectId": "PRJ-DEMO-001",
+    "nodeId": "NODE-001",
+    "foundationType": "slab",
+    "operation": "calculate",
+    "iterationMode": "single",
+    "title": "slab - NODE-001"
+  },
+  "inputValues": {
+    "b0": "1.0",
+    "B": "3.0",
+    "z": "2.5",
+    "h0": "0.5",
+    "h": "2.5",
+    "bearing": "180"
+  },
+  "derivedItems": [
+    { "section": "Derived", "label": "Footprint area", "value": "9.00" },
+    { "section": "Derived", "label": "Concrete volume", "value": "22.50" }
+  ],
+  "graphics": [
+    { "layerKey": "bearing-zone", "title": "Bearing zone", "type": "polygon" },
+    { "layerKey": "footing", "title": "Footing outline", "type": "polygon" },
+    { "layerKey": "column", "title": "Column", "type": "polygon" }
+  ]
+}

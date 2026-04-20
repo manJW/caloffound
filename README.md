@@ -1,8 +1,28 @@
 # caloffound
 
-统一仓库根目录，用于承接 caloffound 的 BS 化改造。
+BS renovation repository for the legacy `caloffoundClient` desktop system.
 
-- 目标架构：Vue2 + Spring Boot 3 + Three.js
-- 当前阶段：初始化
+## Stack
 
-当前仓库仅提供最小骨架，不直接导入旧桌面工程源码。
+- Frontend: Vue2 + Vue Router + Vuex + Element UI + Three.js
+- Backend: Spring Boot 3 + MyBatis
+- Database: legacy MySQL schema used by the old desktop client
+
+## Current Default
+
+- Persistence mode: `db`
+- Backend port: `8088`
+- Frontend build: validated
+
+## Key Docs
+
+- Architecture plan: `/docs/architecture/RENOVATION_PLAN.md`
+- Legacy schema notes: `/docs/database/LEGACY_SCHEMA.md`
+- Configuration: `/docs/operations/CONFIGURATION.md`
+- Regression guide: `/docs/testing/REGRESSION_PLAN.md`
+- Runbook: `/docs/operations/RUNBOOK.md`
+
+## Notes
+
+- The repository keeps a limited `memory` fallback only for controlled transition code paths.
+- Mainline reads and writes are now expected to run against the legacy MySQL database.

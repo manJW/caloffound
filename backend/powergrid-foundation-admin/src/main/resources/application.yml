@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: powergrid-foundation-admin
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${FOUNDATION_DB_URL:jdbc:mysql://127.0.0.1:3306/dceddata?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai}
+    username: ${FOUNDATION_DB_USERNAME:root}
+    password: ${FOUNDATION_DB_PASSWORD:pass@word1}
+    hikari:
+      initialization-fail-timeout: -1
+
+server:
+  port: 8088
+
+mybatis:
+  mapper-locations: classpath*:mapper/foundation/*.xml
+  type-aliases-package: com.powergrid.foundation.core.persistence.model
+
+foundation:
+  upload-dir: ./storage/uploads
+  terrain-cache-dir: ./storage/terrain
+  persistence:
+    mode: db
